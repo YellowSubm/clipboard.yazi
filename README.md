@@ -14,7 +14,7 @@ Synchronize files between the Yazi file manager and your system clipboard. Suppo
 | Linux (X11) | `xclip` | `xclip` |
 | Linux (Wayland) | `wl-copy` (`wl-clipboard`) | `wl-paste` (`wl-clipboard`) |
 | macOS | Built-in `osascript` | Built-in `osascript` |
-| Windows | Built-in `powershell.exe` | Built-in `powershell.exe` |
+| Windows | `pwsh.exe` or built-in `powershell.exe` | `pwsh.exe` or built-in `powershell.exe` |
 
 ## Installation
 
@@ -62,7 +62,7 @@ run = [ "yank", 'plugin clipboard -- --action=copy --notify-unknown-display-serv
 - **`Copy failed: xclip/wl-copy not found`**: install `xclip` for X11 or `wl-clipboard` (`wl-copy`) for Wayland.
 - **`Paste failed: xclip/wl-paste not found`**: install `xclip` for X11 or `wl-clipboard` (`wl-paste`) for Wayland.
 - **`Unknown display server`**: ensure Yazi runs in a Wayland or X11 session. Enable `notify-unknown-display-server` to surface a visible warning.
-- **`powershell.exe not found`**: ensure `%SystemRoot%\System32\WindowsPowerShell\v1.0` is on your `PATH`.
+- **`pwsh.exe` / `powershell.exe` not found**: install PowerShell 7 (`pwsh.exe`) or ensure `%SystemRoot%\System32\WindowsPowerShell\v1.0` is on your `PATH`.
 
 ## Development
 

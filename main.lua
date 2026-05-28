@@ -92,7 +92,7 @@ function M:copy()
 	ya.dbg("Clipboard", "cmd", cmd)
 
 	if ya.target_os() == "windows" then
-		local _, err = self:run_command("powershell.exe", { "-NoProfile", "-NonInteractive", "-Sta", "-Command", cmd })
+		local _, err = self:run_windows_powershell(cmd)
 		if err then
 			return self:notify_error(err)
 		end
@@ -232,6 +232,34 @@ function M:run_command(program, args, opts)
 		ya.err("Clipboard", program .. " failed", status and status.code, output.stdout, output.stderr)
 	end
 	return nil, "Run command failed: " .. program .. " exited with code " .. tostring(status and status.code)
+end
+
+---@return string[]
+function M:windows_powershell_candidates()
+	return { "pwsh.exe", "pwsh", "powershell.exe" }
+end
+
+---@param script string
+---@param opts? ClipboardRunCommandOpts
+---@return Output? output
+---@return string? err
+function M:run_windows_powershell(script, opts)
+	local last_err = nil
+	for _, program in ipairs(self:windows_powershell_candidates()) do
+		local output, err = self:run_command(program, {
+			"-NoLogo",
+			"-NoProfile",
+			"-NonInteractive",
+			"-Sta",
+			"-Command",
+			script,
+		}, opts)
+		if not err then
+			return output, nil
+		end
+		last_err = err
+	end
+	return nil, last_err or "No PowerShell executable found"
 end
 
 ---@return string? cmd
@@ -559,19 +587,15 @@ end
 ---@return string[]? paths
 ---@return string? err
 function M:paste_windows()
-	local output, err = self:run_command("powershell.exe", {
-		"-NoProfile",
-		"-NonInteractive",
-		"-Sta",
-		"-Command",
+	local output, err = self:run_windows_powershell(
 		[[
 Add-Type -AssemblyName System.Windows.Forms
 $files = [System.Windows.Forms.Clipboard]::GetFileDropList()
 if ($files.Count -gt 0) {
   @($files) -join [char]10
 }
-]],
-	})
+]]
+	)
 	if err then
 		return nil, err
 	end
